@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚽ Football Awards — Все награды футбола</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold: #ffd700;
+            --gold-dark: #b8860b;
+            --dark: #0a0a0a;
+            --dark-card: #141414;
+            --text: #ffffff;
+            --text-muted: #888;
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.03) 0%, transparent 50%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Header */
+        header {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 80px 20px 60px;
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(4rem, 15vw, 12rem);
+            letter-spacing: 0.1em;
+            background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 60px rgba(255, 215, 0, 0.3);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        /* Trophy Icon */
+        .trophy-icon {
+            font-size: 5rem;
+            margin: 30px 0;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            padding: 20px;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--gold);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        main {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            color: var(--gold);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .section-title::before,
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        /* Awards Grid */
+        .awards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .award-card {
+            background: var(--dark-card);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .award-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .award-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .award-card:hover::before {
+            opacity: 1;
+        }
+
+        .award-emoji {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .award-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .award-country {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .award-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .award-year {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--gold);
+            color: var(--dark);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1rem;
+        }
+
+        /* Time Control Section */
+        .time-section {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(0, 0, 0, 0.5) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .time-section::before {
+            content: '⏰';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8rem;
+            opacity: 0.1;
+        }
+
+        .time-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .time-display {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(4rem, 10vw, 8rem);
+            color: var(--gold);
+            text-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+            margin: 30px 0;
+        }
+
+        .time-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .time-btn {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 15px 30px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+
+        .time-btn:hover {
+            background: var(--gold);
+            color: var(--dark);
+            transform: scale(1.05);
+        }
+
+        /* User Section - Ultimate Fan */
+        .fan-section {
+            background: var(--dark-card);
+            border: 2px solid var(--gold);
+            border-radius: 30px;
+            padding: 60px;
+            margin: 80px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .fan-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--gold);
+            margin-bottom: 30px;
+        }
+
+        .fan-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: var(--dark);
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(255, 215, 0, 0); }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        /* Scroll Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .awards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-section, .fan-section {
+                padding: 40px 20px;
+            }
+
+            nav ul {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 85%; animation-delay: 5s;"></div>
+        <div class="particle" style="left: 95%; animation-delay: 2.5s;"></div>
+    </div>
+
+    <header>
+        <h1 class="logo">FOOTBALL AWARDS</h1>
+        <p class="subtitle">Все награды мира футбола</p>
+        <div class="trophy-icon">🏆</div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#awards">Награды</a></li>
+            <li><a href="#ballon">Золотой мяч</a></li>
+            <li><a href="#fifa">FIFA Awards</a></li>
+            <li><a href="#time">Управление временем</a></li>
+            <li><a href="#fan">Стать легендой</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="ballon" class="reveal">
+            <h2 class="section-title">🏅 ЗОЛОТОЙ МЯЧ</h2>
+            <div class="awards-grid">
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">⚽</span>
+                    <h3 class="award-name">Ballon d'Or</h3>
+                    <p class="award-country">🇫🇷 France Football</p>
+                    <p class="award-desc">Самая престижная индивидуальная награда в мировом футболе. Вручается лучшему футболисту года.</p>
+                </div>
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">👑</span>
+                    <h3 class="award-name">Women's Ballon d'Or</h3>
+                    <p class="award-country">🇫🇷 France Football</p>
+                    <p class="award-desc">Награда лучшей футболистке года. Вручается с 2018 года.</p>
+                </div>
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">🌟</span>
+                    <h3 class="award-name">Kopa Trophy</h3>
+                    <p class="award-country">🇫🇷 France Football</p>
+                    <p class="award-desc">Приз лучшему молодому игроку мира до 21 года.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="fifa" class="reveal">
+            <h2 class="section-title">🌍 FIFA AWARDS</h2>
+            <div class="awards-grid">
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">👤</span>
+                    <h3 class="award-name">The Best FIFA Men's Player</h3>
+                    <p class="award-country">🌍 FIFA</p>
+                    <p class="award-desc">Лучший игрок года по версии FIFA. Голосование проводится среди капитанов, тренеров и журналистов.</p>
+                </div>
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">🧤</span>
+                    <h3 class="award-name">The Best FIFA Goalkeeper</h3>
+                    <p class="award-country">🌍 FIFA</p>
+                    <p class="award-desc">Лучший вратарь года. Включён в FIFA FIFPro World XI.</p>
+                </div>
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">🎯</span>
+                    <h3 class="award-name">Puskás Award</h3>
+                    <p class="award-country">🌍 FIFA</p>
+                    <p class="award-desc">Приз за самый красивый гол года. Назван в честь Ференца Пушкаша.</p>
+                </div>
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">⚽</span>
+                    <h3 class="award-name">FIFA World Cup</h3>
+                    <p class="award-country">🌍 FIFA</p>
+                    <p class="award-desc">Чемпионат мира — главный турнир планеты. Проводится каждые 4 года.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="awards" class="reveal">
+            <h2 class="section-title">🏆 ДРУГИЕ НАГРАДЫ</h2>
+            <div class="awards-grid">
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">🌟</span>
+                    <h3 class="award-name">UEFA Player of the Year</h3>
+                    <p class="award-country">🇪🇺 UEFA</p>
+                    <p class="award-desc">Лучший игрок Европы по версии UEFA. Вручается с 2011 года.</p>
+                </div>
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">🥇</span>
+                    <h3 class="award-name">UEFA Champions League</h3>
+                    <p class="award-country">🇪🇺 UEFA</p>
+                    <p class="award-desc">Сильнейший клубный турнир Европы. Победитель — лучший клуб мира.</p>
+                </div>
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">🏅</span>
+                    <h3 class="award-name">Golden Boot</h3>
+                    <p class="award-country">🇬🇧 Premier League</p>
+                    <p class="award-desc">Лучший бомбардир английской Премьер-лиги. Награда имени Алана Ширера.</p>
+                </div>
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">💎</span>
+                    <h3 class="award-name">Golden Boy</h3>
+                    <p class="award-country">🇮🇹 Tuttosport</p>
+                    <p class="award-desc">Премия лучшему молодому игроку Европы до 21 года. Вручается с 2003 года.</p>
+                </div>
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">🎖️</span>
+                    <h3 class="award-name">FIFA World Cup Golden Ball</h3>
+                    <p class="award-country">🌍 FIFA</p>
+                    <p class="award-desc">Приз лучшему игроку чемпионата мира. Вручается с 1938 года.</p>
+                </div>
+                <div class="award-card">
+                    <span class="award-year">2024</span>
+                    <span class="award-emoji">⚽</span>
+                    <h3 class="award-name">European Golden Shoe</h3>
+                    <p class="award-country">🇪🇺 UEFA</p>
+                    <p class="award-desc">Лучший бомбардир европейских лиг. Учитывается результативность.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="time" class="time-section reveal">
+            <h2 class="time-title">⏰ УПРАВЛЕНИЕ ВРЕМЕНЕМ</h2>
+            <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 20px;">
+                На этой странице ты — хозяин времени! Контролируй часы, как ни один информатик не сможет!
+            </p>
+            <div class="time-display" id="clock">00:00:00</div>
+            <div class="time-controls">
+                <button class="time-btn" onclick="toggleTime()">⏯️ СТАРТ/ПАУЗА</button>
+                <button class="time-btn" onclick="resetTime()">🔄 СБРОС</button>
+                <button class="time-btn" onclick="speedUp()">⚡ +10x</button>
+                <button class="time-btn" onclick="speedDown()">🐢 -0.5x</button>
+            </div>
+        </section>
+
+        <section id="fan" class="fan-section reveal">
+            <h2 class="fan-title">👑 ТЫ — ЛЕГЕНДА!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 1.2rem;">
+                Ты посетил сайт всех футбольных наград! Ты уже на пути к величию!
+            </p>
+            <div class="fan-badge">⭐ SUPER FAN ⭐</div>
+            <p style="color: var(--gold); margin-top: 30px; font-style: italic;">
+                «Тот, кто знает всё о футболе — непобедим!» ⚽🏆
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>⚽ FOOTBALL AWARDS — Все права защищены 2024</p>
+        <p>Создано с ❤️ для настоящих фанатов футбола</p>
+    </footer>
+
+    <script>
+        // Time Control
+        let seconds = 0;
+        let isRunning = false;
+        let speed = 1;
+        let interval;
+
+        function updateClock() {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            document.getElementById('clock').textContent = 
+                `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function tick() {
+            if (isRunning) {
+                seconds += (1/60) * speed;
+                updateClock();
+            }
+        }
+
+        function toggleTime() {
+            isRunning = !isRunning;
+        }
+
+        function resetTime() {
+            seconds = 0;
+            speed = 1;
+            isRunning = false;
+            updateClock();
+        }
+
+        function speedUp() {
+            speed = Math.min(speed + 0.5, 10);
+        }
+
+        function speedDown() {
+            speed = Math.max(speed - 0.5, 0.5);
+        }
+
+        setInterval(tick, 1000/60);
+        updateClock();
+
+        // Scroll Reveal
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(element => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 100) {
+                    element.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+    </script>
+</body>
+</html>
