@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚽ Football Awards — Все награды футбола</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -23,11 +23,181 @@
         }
 
         body {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Montserrat', sans-serif;
             background: var(--dark);
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .modal {
+            background: var(--dark-card);
+            border: 2px solid var(--gold);
+            border-radius: 30px;
+            max-width: 900px;
+            width: 100%;
+            margin: 40px auto;
+            position: relative;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            padding: 30px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .modal-close {
+            background: none;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 4px;
+        }
+
+        /* Winners List */
+        .winners-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .winner-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 20px;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .winner-item:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: var(--gold);
+            transform: translateX(10px);
+        }
+
+        .winner-year {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            color: var(--gold);
+        }
+
+        .winner-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .winner-team {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .winner-country {
+            font-size: 1.5rem;
+        }
+
+        /* Team winners */
+        .team-winners {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .team-item {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .team-item:hover {
+            background: rgba(255, 215, 0, 0.1);
+            transform: scale(1.05);
+        }
+
+        .team-flag {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .team-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .team-years {
+            color: var(--gold);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
         }
 
         /* Animated Background */
@@ -39,6 +209,7 @@
             height: 100%;
             z-index: 0;
             overflow: hidden;
+            pointer-events: none;
         }
 
         .bg-animation::before {
@@ -57,7 +228,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Floating particles */
         .particle {
             position: absolute;
             width: 4px;
@@ -108,7 +278,6 @@
             text-transform: uppercase;
         }
 
-        /* Trophy Icon */
         .trophy-icon {
             font-size: 5rem;
             margin: 30px 0;
@@ -125,7 +294,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(10, 10, 10, 0.9);
+            background: rgba(10, 10, 10, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 215, 0, 0.2);
             padding: 20px;
@@ -177,7 +346,6 @@
             padding: 40px 20px;
         }
 
-        /* Section Titles */
         .section-title {
             font-family: 'Bebas Neue', sans-serif;
             font-size: clamp(2rem, 5vw, 4rem);
@@ -196,7 +364,6 @@
             background: linear-gradient(90deg, transparent, var(--gold), transparent);
         }
 
-        /* Awards Grid */
         .awards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -237,6 +404,11 @@
             opacity: 1;
         }
 
+        .award-card:hover .view-history {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         .award-emoji {
             font-size: 4rem;
             margin-bottom: 20px;
@@ -275,7 +447,23 @@
             font-size: 1rem;
         }
 
-        /* Time Control Section */
+        .view-history {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: var(--gold);
+            color: var(--dark);
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+        }
+
+        /* Time Section */
         .time-section {
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(0, 0, 0, 0.5) 100%);
             border: 1px solid rgba(255, 215, 0, 0.2);
@@ -339,7 +527,7 @@
             transform: scale(1.05);
         }
 
-        /* User Section - Ultimate Fan */
+        /* Fan Section */
         .fan-section {
             background: var(--dark-card);
             border: 2px solid var(--gold);
@@ -373,19 +561,19 @@
             50% { box-shadow: 0 0 0 20px rgba(255, 215, 0, 0); }
         }
 
-        /* Footer */
         footer {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-muted);
             border-top: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+            z-index: 10;
         }
 
         footer p {
             margin-bottom: 10px;
         }
 
-        /* Scroll Animation */
         .reveal {
             opacity: 0;
             transform: translateY(50px);
@@ -397,7 +585,23 @@
             transform: translateY(0);
         }
 
-        /* Responsive */
+        /* Stats */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
         @media (max-width: 768px) {
             .awards-grid {
                 grid-template-columns: 1fr;
@@ -410,10 +614,34 @@
             nav ul {
                 gap: 20px;
             }
+
+            .winner-item {
+                grid-template-columns: 60px 1fr;
+                gap: 10px;
+            }
+
+            .winner-country {
+                display: none;
+            }
+
+            .team-winners {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">🏆 Победители</h2>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
     <div class="bg-animation">
         <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
         <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
@@ -432,11 +660,11 @@
 
     <nav>
         <ul>
-            <li><a href="#awards">Награды</a></li>
-            <li><a href="#ballon">Золотой мяч</a></li>
-            <li><a href="#fifa">FIFA Awards</a></li>
-            <li><a href="#time">Управление временем</a></li>
-            <li><a href="#fan">Стать легендой</a></li>
+            <li><a href="#ballon">🏅 Золотой мяч</a></li>
+            <li><a href="#fifa">🌍 FIFA</a></li>
+            <li><a href="#clubs">⚽ Клубные турниры</a></li>
+            <li><a href="#national">🏆 Сборные</a></li>
+            <li><a href="#time">⏰ Время</a></li>
         </ul>
     </nav>
 
@@ -444,26 +672,125 @@
         <section id="ballon" class="reveal">
             <h2 class="section-title">🏅 ЗОЛОТОЙ МЯЧ</h2>
             <div class="awards-grid">
-                <div class="award-card">
-                    <span class="award-year">2024</span>
+                <div class="award-card" onclick="showBallonDor()">
+                    <span class="award-year">1956-2024</span>
                     <span class="award-emoji">⚽</span>
                     <h3 class="award-name">Ballon d'Or</h3>
                     <p class="award-country">🇫🇷 France Football</p>
-                    <p class="award-desc">Самая престижная индивидуальная награда в мировом футболе. Вручается лучшему футболисту года.</p>
+                    <p class="award-desc">Самая престижная награда. Кликни, чтобы увидеть всех победителей!</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 69 победителей</span>
+                        <span class="stat-item">🇦🇷 Месси — 8 раз</span>
+                    </div>
                 </div>
-                <div class="award-card">
-                    <span class="award-year">2024</span>
+                <div class="award-card" onclick="showWomensBallon()">
+                    <span class="award-year">2018-2024</span>
                     <span class="award-emoji">👑</span>
                     <h3 class="award-name">Women's Ballon d'Or</h3>
                     <p class="award-country">🇫🇷 France Football</p>
-                    <p class="award-desc">Награда лучшей футболистке года. Вручается с 2018 года.</p>
+                    <p class="award-desc">Лучшая футболистка года. Вручается с 2018 года.</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 7 победителей</span>
+                        <span class="stat-item">🇪🇸 Алексия — 3 раза</span>
+                    </div>
                 </div>
-                <div class="award-card">
-                    <span class="award-year">2024</span>
+                <div class="award-card" onclick="showKopaTrophy()">
+                    <span class="award-year">2018-2024</span>
                     <span class="award-emoji">🌟</span>
                     <h3 class="award-name">Kopa Trophy</h3>
                     <p class="award-country">🇫🇷 France Football</p>
-                    <p class="award-desc">Приз лучшему молодому игроку мира до 21 года.</p>
+                    <p class="award-desc">Лучший молодой игрок до 21 года.</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 7 победителей</span>
+                        <span class="stat-item">🇫🇷 Белинхэм — 2023</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="national" class="reveal">
+            <h2 class="section-title">🏆 ЧЕМПИОНАТЫ МИРА</h2>
+            <div class="awards-grid">
+                <div class="award-card" onclick="showWorldCup()">
+                    <span class="award-year">1930-2022</span>
+                    <span class="award-emoji">🌍</span>
+                    <h3 class="award-name">FIFA World Cup</h3>
+                    <p class="award-country">🌍 FIFA</p>
+                    <p class="award-desc">Главный турнир планеты. Кликни за всеми победителями!</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 22 турнира</span>
+                        <span class="stat-item">🇧🇷 Бразилия — 5 раз</span>
+                    </div>
+                </div>
+                <div class="award-card" onclick="showEuroCup()">
+                    <span class="award-year">1960-2024</span>
+                    <span class="award-emoji">🇪🇺</span>
+                    <h3 class="award-name">UEFA Euro</h3>
+                    <p class="award-country">🇪🇺 UEFA</p>
+                    <p class="award-desc">Чемпионат Европы среди сборных.</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 17 турниров</span>
+                        <span class="stat-item">🇩🇪 Испания — 3 раза</span>
+                    </div>
+                </div>
+                <div class="award-card" onclick="showCopaAmerica()">
+                    <span class="award-year">1916-2024</span>
+                    <span class="award-emoji">🏅</span>
+                    <h3 class="award-name">Copa América</h3>
+                    <p class="award-country">🇧🇷🇦🇷 CONMEBOL</p>
+                    <p class="award-desc">Старейший международный турнир.</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 48 турниров</span>
+                        <span class="stat-item">🇦🇷 Аргентина — 16 раз</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="clubs" class="reveal">
+            <h2 class="section-title">⚽ КЛУБНЫЕ ТУРНИРЫ</h2>
+            <div class="awards-grid">
+                <div class="award-card" onclick="showChampionsLeague()">
+                    <span class="award-year">1956-2024</span>
+                    <span class="award-emoji">🏆</span>
+                    <h3 class="award-name">UEFA Champions League</h3>
+                    <p class="award-country">🇪🇺 UEFA</p>
+                    <p class="award-desc">Лига чемпионов — элита клубного футбола!</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 69 финалов</span>
+                        <span class="stat-item">🇪🇸 Реал — 15 раз</span>
+                    </div>
+                </div>
+                <div class="award-card" onclick="showSuperCup()">
+                    <span class="award-year">1974-2024</span>
+                    <span class="award-emoji">⭐</span>
+                    <h3 class="award-name">UEFA Super Cup</h3>
+                    <p class="award-country">🇪🇺 UEFA</p>
+                    <p class="award-desc">Матч ЛЧ vs ЛЕ победители.</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 49 матчей</span>
+                        <span class="stat-item">🇪🇸 Реал/Барса — лидеры</span>
+                    </div>
+                </div>
+                <div class="award-card" onclick="showClubWorldCup()">
+                    <span class="award-year">2000-2024</span>
+                    <span class="award-emoji">🌐</span>
+                    <h3 class="award-name">FIFA Club World Cup</h3>
+                    <p class="award-country">🌍 FIFA</p>
+                    <p class="award-desc">Чемпион чемпионов мира.</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 21 турнир</span>
+                        <span class="stat-item">🇧🇷 Реал Мадрид — 5 раз</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -471,81 +798,41 @@
         <section id="fifa" class="reveal">
             <h2 class="section-title">🌍 FIFA AWARDS</h2>
             <div class="awards-grid">
-                <div class="award-card">
-                    <span class="award-year">2024</span>
+                <div class="award-card" onclick="showFIFAPlayer()">
+                    <span class="award-year">2016-2024</span>
                     <span class="award-emoji">👤</span>
                     <h3 class="award-name">The Best FIFA Men's Player</h3>
                     <p class="award-country">🌍 FIFA</p>
-                    <p class="award-desc">Лучший игрок года по версии FIFA. Голосование проводится среди капитанов, тренеров и журналистов.</p>
+                    <p class="award-desc">Лучший игрок по версии FIFA.</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 9 победителей</span>
+                        <span class="stat-item">🇦🇷 Месси — 3 раза</span>
+                    </div>
                 </div>
-                <div class="award-card">
-                    <span class="award-year">2024</span>
-                    <span class="award-emoji">🧤</span>
-                    <h3 class="award-name">The Best FIFA Goalkeeper</h3>
-                    <p class="award-country">🌍 FIFA</p>
-                    <p class="award-desc">Лучший вратарь года. Включён в FIFA FIFPro World XI.</p>
-                </div>
-                <div class="award-card">
-                    <span class="award-year">2024</span>
+                <div class="award-card" onclick="showPuskas()">
+                    <span class="award-year">2009-2024</span>
                     <span class="award-emoji">🎯</span>
                     <h3 class="award-name">Puskás Award</h3>
                     <p class="award-country">🌍 FIFA</p>
-                    <p class="award-desc">Приз за самый красивый гол года. Назван в честь Ференца Пушкаша.</p>
+                    <p class="award-desc">Самый красивый гол года.</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 16 победителей</span>
+                        <span class="stat-item">🌍 Со всего мира</span>
+                    </div>
                 </div>
-                <div class="award-card">
-                    <span class="award-year">2024</span>
-                    <span class="award-emoji">⚽</span>
-                    <h3 class="award-name">FIFA World Cup</h3>
-                    <p class="award-country">🌍 FIFA</p>
-                    <p class="award-desc">Чемпионат мира — главный турнир планеты. Проводится каждые 4 года.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="awards" class="reveal">
-            <h2 class="section-title">🏆 ДРУГИЕ НАГРАДЫ</h2>
-            <div class="awards-grid">
-                <div class="award-card">
-                    <span class="award-year">2024</span>
-                    <span class="award-emoji">🌟</span>
-                    <h3 class="award-name">UEFA Player of the Year</h3>
-                    <p class="award-country">🇪🇺 UEFA</p>
-                    <p class="award-desc">Лучший игрок Европы по версии UEFA. Вручается с 2011 года.</p>
-                </div>
-                <div class="award-card">
-                    <span class="award-year">2024</span>
-                    <span class="award-emoji">🥇</span>
-                    <h3 class="award-name">UEFA Champions League</h3>
-                    <p class="award-country">🇪🇺 UEFA</p>
-                    <p class="award-desc">Сильнейший клубный турнир Европы. Победитель — лучший клуб мира.</p>
-                </div>
-                <div class="award-card">
-                    <span class="award-year">2024</span>
-                    <span class="award-emoji">🏅</span>
-                    <h3 class="award-name">Golden Boot</h3>
-                    <p class="award-country">🇬🇧 Premier League</p>
-                    <p class="award-desc">Лучший бомбардир английской Премьер-лиги. Награда имени Алана Ширера.</p>
-                </div>
-                <div class="award-card">
-                    <span class="award-year">2024</span>
-                    <span class="award-emoji">💎</span>
-                    <h3 class="award-name">Golden Boy</h3>
-                    <p class="award-country">🇮🇹 Tuttosport</p>
-                    <p class="award-desc">Премия лучшему молодому игроку Европы до 21 года. Вручается с 2003 года.</p>
-                </div>
-                <div class="award-card">
-                    <span class="award-year">2024</span>
+                <div class="award-card" onclick="showFIFAGoldenBall()">
+                    <span class="award-year">1938-2022</span>
                     <span class="award-emoji">🎖️</span>
-                    <h3 class="award-name">FIFA World Cup Golden Ball</h3>
+                    <h3 class="award-name">World Cup Golden Ball</h3>
                     <p class="award-country">🌍 FIFA</p>
-                    <p class="award-desc">Приз лучшему игроку чемпионата мира. Вручается с 1938 года.</p>
-                </div>
-                <div class="award-card">
-                    <span class="award-year">2024</span>
-                    <span class="award-emoji">⚽</span>
-                    <h3 class="award-name">European Golden Shoe</h3>
-                    <p class="award-country">🇪🇺 UEFA</p>
-                    <p class="award-desc">Лучший бомбардир европейских лиг. Учитывается результативность.</p>
+                    <p class="award-desc">Лучший игрок ЧМ.</p>
+                    <div class="view-history">📜 Смотреть историю</div>
+                    <div class="stats-row">
+                        <span class="stat-item">🏆 22 победителя</span>
+                        <span class="stat-item">🇦🇷 Месси/Марадона</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -582,11 +869,452 @@
     </footer>
 
     <script>
+        // Data
+        const ballonDorWinners = [
+            {year: 2024, name: "Винисиус Жуниор", team: "Реал Мадрид", flag: "🇧🇷"},
+            {year: 2023, name: "Лионель Месси", team: "Интер Майами", flag: "🇦🇷"},
+            {year: 2022, name: "Карим Бензема", team: "Реал Мадрид", flag: "🇫🇷"},
+            {year: 2021, name: "Лионель Месси", team: "ПСЖ", flag: "🇦🇷"},
+            {year: 2020, name: "Левандовски", team: "Бавария", flag: "🇵🇱"},
+            {year: 2019, name: "Лионель Месси", team: "Барселона", flag: "🇦🇷"},
+            {year: 2018, name: "Лука Модрич", team: "Реал Мадрид", flag: "🇭🇷"},
+            {year: 2017, name: "Криштиану Роналду", team: "Реал Мадрид", flag: "🇵🇹"},
+            {year: 2016, name: "Криштиану Роналду", team: "Реал Мадрид", flag: "🇵🇹"},
+            {year: 2015, name: "Лионель Месси", team: "Барселона", flag: "🇦🇷"},
+            {year: 2014, name: "Криштиану Роналду", team: "Реал Мадрид", flag: "🇵🇹"},
+            {year: 2013, name: "Криштиану Роналду", team: "Реал Мадрид", flag: "🇵🇹"},
+            {year: 2012, name: "Лионель Месси", team: "Барселона", flag: "🇦🇷"},
+            {year: 2011, name: "Лионель Месси", team: "Барселона", flag: "🇦🇷"},
+            {year: 2010, name: "Лионель Месси", team: "Барселона", flag: "🇦🇷"},
+            {year: 2009, name: "Лионель Месси", team: "Барселона", flag: "🇦🇷"},
+            {year: 2008, name: "Криштиану Роналду", team: "Манчестер Юнайтед", flag: "🇵🇹"},
+            {year: 2007, name: "Кака", team: "Милан", flag: "🇧🇷"},
+            {year: 2006, name: "Фабио Каннаваро", team: "Реал Мадрид", flag: "🇮🇹"},
+            {year: 2005, name: "Роналдиньо", team: "Барселона", flag: "🇧🇷"},
+            {year: 2004, name: "Андрей Шевченко", team: "Милан", flag: "🇺🇦"},
+            {year: 2003, name: "Павел Недвед", team: "Ювентус", flag: "🇨🇿"},
+            {year: 2002, name: "Роналдо", team: "Реал Мадрид", flag: "🇧🇷"},
+            {year: 2001, name: "Луис Фигу", team: "Реал Мадрид", flag: "🇵🇹"},
+            {year: 2000, name: "Луис Фигу", team: "Реал Мадрид", flag: "🇵🇹"},
+            {year: 1999, name: "Ривалдо", team: "Барселона", flag: "🇧🇷"},
+            {year: 1998, name: "Зинедин Зидан", team: "Ювентус", flag: "🇫🇷"},
+            {year: 1997, name: "Роналдо", team: "Интер", flag: "🇧🇷"},
+            {year: 1996, name: "Матиас Заммер", team: "Боруссия Д", flag: "🇩🇪"},
+            {year: 1995, name: "Джордж Веа", team: "Милан", flag: "🇱🇷"},
+            {year: 1994, name: "Христо Стоичков", team: "Барселона", flag: "🇧🇬"},
+            {year: 1993, name: "Роберто Баagio", team: "Марсель", flag: "🇮🇹"},
+            {year: 1992, name: "Марко ван Бастен", team: "Милан", flag: "🇳🇱"},
+            {year: 1991, name: "Жан-Пьер Папен", team: "Олимпик Марсель", flag: "🇫🇷"},
+            {year: 1990, name: "Лотар Маттеус", team: "Интер", flag: "🇩🇪"},
+            {year: 1989, name: "Марко ван Бастен", team: "Милан", flag: "🇳🇱"},
+            {year: 1988, name: "Марко ван Бастен", team: "Милан", flag: "🇳🇱"},
+            {year: 1987, name: "Рууд Гуллит", team: "Милан", flag: "🇳🇱"},
+            {year: 1986, name: "Игорь Беланов", team: "Динамо Киев", flag: "🇺🇦"},
+            {year: 1985, name: "Мишель Платини", team: "Ювентус", flag: "🇫🇷"},
+            {year: 1984, name: "Мишель Платини", team: "Ювентус", flag: "🇫🇷"},
+            {year: 1983, name: "Мишель Платини", team: "Ювентус", flag: "🇫🇷"},
+            {year: 1982, name: "Паоло Росси", team: "Ювентус", flag: "🇮🇹"},
+            {year: 1981, name: "Карл-Хайнц Руменигге", team: "Бавария", flag: "🇩🇪"},
+            {year: 1980, name: "Карл-Хайнц Руменигге", team: "Бавария", flag: "🇩🇪"},
+            {year: 1979, name: "Кевин Киган", team: "Гамбург", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1978, name: "Марио Кемпес", team: "Валенсия", flag: "🇦🇷"},
+            {year: 1977, name: "Альфредо Ди Стефано", team: "Реал Мадрид", flag: "🇦🇷"},
+            {year: 1976, name: "Франц Беккенбауэр", team: "Бавария", flag: "🇩🇪"},
+            {year: 1975, name: "Олег Блохин", team: "Динамо Киев", flag: "🇺🇦"},
+            {year: 1974, name: "Йохан Круифф", team: "Барселона", flag: "🇳🇱"},
+            {year: 1973, name: "Йохан Круифф", team: "Барселона", flag: "🇳🇱"},
+            {year: 1972, name: "Франц Беккенбауэр", team: "Бавария", flag: "🇩🇪"},
+            {year: 1971, name: "Йохан Круифф", team: "Аякс", flag: "🇳🇱"},
+            {year: 1970, name: "Герд Мюллер", team: "Бавария", flag: "🇩🇪"},
+            {year: 1969, name: "Габи Жазиньский", team: "Бенфика", flag: "🇵🇱"},
+            {year: 1968, name: "Джордж Бест", team: "Манчестер Юнайтед", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1967, name: "Флориан Альберт", team: "Ференцварош", flag: "🇭🇺"},
+            {year: 1966, name: "Боб Чаллис", team: "Бенфика", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1965, name: "Эйсебио", team: "Бенфика", flag: "🇵🇹"},
+            {year: 1964, name: "Джон Чарльз", team: "Ювентус", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1963, name: "Лев Яшин", team: "Динамо Москва", flag: "🇷🇺"},
+            {year: 1962, name: "Жозе Альтафини", team: "Милан", flag: "🇧🇷"},
+            {year: 1961, name: "Оскар Мигес", team: "Бенфика", flag: "🇦🇷"},
+            {year: 1960, name: "Луис Суарес", team: "Барселона", flag: "🇺🇾"},
+            {year: 1959, name: "Альфредо Ди Стефано", team: "Реал Мадрид", flag: "🇦🇷"},
+            {year: 1958, name: "Раймонд Копа", team: "Реал Мадрид", flag: "🇫🇷"},
+            {year: 1957, name: "Альфредо Ди Стефано", team: "Реал Мадрид", flag: "🇦🇷"},
+            {year: 1956, name: "Стэнли Мэтьюз", team: "Блэкпул", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"}
+        ];
+
+        const championsLeagueWinners = [
+            {year: 2024, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 2023, team: "Манчестер Сити", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 2022, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 2021, team: "Челси", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 2020, team: "Бавария", flag: "🇩🇪"},
+            {year: 2019, team: "Ливерпуль", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 2018, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 2017, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 2016, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 2015, team: "Барселона", flag: "🇪🇸"},
+            {year: 2014, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 2013, team: "Бавария", flag: "🇩🇪"},
+            {year: 2012, team: "Челси", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 2011, team: "Барселона", flag: "🇪🇸"},
+            {year: 2010, team: "Интер", flag: "🇮🇹"},
+            {year: 2009, team: "Барселона", flag: "🇪🇸"},
+            {year: 2008, team: "Манчестер Юнайтед", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 2007, team: "Милан", flag: "🇮🇹"},
+            {year: 2006, team: "Барселона", flag: "🇪🇸"},
+            {year: 2005, team: "Ливерпуль", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 2004, team: "Порту", flag: "🇵🇹"},
+            {year: 2003, team: "Милан", flag: "🇮🇹"},
+            {year: 2002, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 2001, team: "Бавария", flag: "🇩🇪"},
+            {year: 2000, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 1999, team: "Манчестер Юнайтед", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1998, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 1997, team: "Боруссия Д", flag: "🇩🇪"},
+            {year: 1996, team: "Ювентус", flag: "🇮🇹"},
+            {year: 1995, team: "Аякс", flag: "🇳🇱"},
+            {year: 1994, team: "Милан", flag: "🇮🇹"},
+            {year: 1993, team: "Олимпик Марсель", flag: "🇫🇷"},
+            {year: 1992, team: "Барселона", flag: "🇪🇸"},
+            {year: 1991, team: "Црвена Звезда", flag: "🇷🇸"},
+            {year: 1990, team: "Милан", flag: "🇮🇹"},
+            {year: 1989, team: "Милан", flag: "🇮🇹"},
+            {year: 1988, team: "ПСВ Эйндховен", flag: "🇳🇱"},
+            {year: 1987, team: "Порту", flag: "🇵🇹"},
+            {year: 1986, team: "Стяуа", flag: "🇷🇴"},
+            {year: 1985, team: "Ювентус", flag: "🇮🇹"},
+            {year: 1984, team: "Ливерпуль", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1983, team: "Гамбург", flag: "🇩🇪"},
+            {year: 1982, team: "Астон Вилла", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1981, team: "Ливерпуль", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1980, team: "Ноттингем Форест", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1979, team: "Ноттингем Форест", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1978, team: "Ливерпуль", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1977, team: "Ливерпуль", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1976, team: "Бавария", flag: "🇩🇪"},
+            {year: 1975, team: "Бавария", flag: "🇩🇪"},
+            {year: 1974, team: "Бавария", flag: "🇩🇪"},
+            {year: 1973, team: "Аякс", flag: "🇳🇱"},
+            {year: 1972, team: "Аякс", flag: "🇳🇱"},
+            {year: 1971, team: "Аякс", flag: "🇳🇱"},
+            {year: 1970, team: "Фейеноорд", flag: "🇳🇱"},
+            {year: 1969, team: "Милан", flag: "🇮🇹"},
+            {year: 1968, team: "Манчестер Юнайтед", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1967, team: "Селтик", flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿"},
+            {year: 1966, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 1965, team: "Интер", flag: "🇮🇹"},
+            {year: 1964, team: "Интер", flag: "🇮🇹"},
+            {year: 1963, team: "Милан", flag: "🇮🇹"},
+            {year: 1962, team: "Бенфика", flag: "🇵🇹"},
+            {year: 1961, team: "Бенфика", flag: "🇵🇹"},
+            {year: 1960, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 1959, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 1958, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 1957, team: "Реал Мадрид", flag: "🇪🇸"},
+            {year: 1956, team: "Реал Мадрид", flag: "🇪🇸"}
+        ];
+
+        const worldCupWinners = [
+            {year: 2022, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+            {year: 2018, team: "🇫🇷 Франция", flag: "🇫🇷"},
+            {year: 2014, team: "🇩🇪 Германия", flag: "🇩🇪"},
+            {year: 2010, team: "🇪🇸 Испания", flag: "🇪🇸"},
+            {year: 2006, team: "🇮🇹 Италия", flag: "🇮🇹"},
+            {year: 2002, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+            {year: 1998, team: "🇫🇷 Франция", flag: "🇫🇷"},
+            {year: 1994, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+            {year: 1990, team: "🇩🇪 Германия", flag: "🇩🇪"},
+            {year: 1986, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+            {year: 1982, team: "🇮🇹 Италия", flag: "🇮🇹"},
+            {year: 1978, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+            {year: 1974, team: "🇩🇪 Германия", flag: "🇩🇪"},
+            {year: 1970, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+            {year: 1966, team: "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Англия", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1962, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+            {year: 1958, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+            {year: 1954, team: "🇩🇪 Германия", flag: "🇩🇪"},
+            {year: 1950, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+            {year: 1938, team: "🇮🇹 Италия", flag: "🇮🇹"},
+            {year: 1934, team: "🇮🇹 Италия", flag: "🇮🇹"},
+            {year: 1930, team: "🇺🇾 Уругвай", flag: "🇺🇾"}
+        ];
+
+        const euroWinners = [
+            {year: 2024, team: "🇪🇸 Испания", flag: "🇪🇸"},
+            {year: 2021, team: "🇮🇹 Италия", flag: "🇮🇹"},
+            {year: 2016, team: "🇵🇹 Португалия", flag: "🇵🇹"},
+            {year: 2012, team: "🇪🇸 Испания", flag: "🇪🇸"},
+            {year: 2008, team: "🇪🇸 Испания", flag: "🇪🇸"},
+            {year: 2004, team: "🇬🇷 Греция", flag: "🇬🇷"},
+            {year: 2000, team: "🇫🇷 Франция", flag: "🇫🇷"},
+            {year: 1996, team: "🇩🇪 Германия", flag: "🇩🇪"},
+            {year: 1992, team: "🇩🇰 Дания", flag: "🇩🇰"},
+            {year: 1988, team: "🇳🇱 Нидерланды", flag: "🇳🇱"},
+            {year: 1984, team: "🇫🇷 Франция", flag: "🇫🇷"},
+            {year: 1980, team: "🇩🇪 Германия", flag: "🇩🇪"},
+            {year: 1976, team: "🇨🇿 Чехословакия", flag: "🇨🇿"},
+            {year: 1972, team: "🇩🇪 Германия", flag: "🇩🇪"},
+            {year: 1968, team: "🇮🇹 Италия", flag: "🇮🇹"},
+            {year: 1964, team: "🇪🇸 Испания", flag: "🇪🇸"},
+            {year: 1960, team: "🇷🇺 СССР", flag: "🇷🇺"}
+        ];
+
+        const womensBallonWinners = [
+            {year: 2024, name: "Аит Бонначи", team: "Барселона", flag: "🇲🇦"},
+            {year: 2023, name: "Аит Бонначи", team: "Барселона", flag: "🇲🇦"},
+            {year: 2022, name: "Алексия Бурельяс", team: "Барселона", flag: "🇪🇸"},
+            {year: 2021, name: "Алексия Бурельяс", team: "Барселона", flag: "🇪🇸"},
+            {year: 2020, name: "Пернилле Хардер", team: "Вольфсбург", flag: "🇩🇰"},
+            {year: 2019, name: "Меган Рапино", team: "Сиэтл Тhunder", flag: "🇺🇸"},
+            {year: 2018, name: "Ада Хегерберг", team: "Лион", flag: "🇳🇴"}
+        ];
+
+        const kopaTrophyWinners = [
+            {year: 2024, name: "Ламин Ямаль", team: "Барселона", flag: "🇪🇸"},
+            {year: 2023, name: "Жуд Беллингхэм", team: "Боруссия Д", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 2022, name: "Гави", team: "Барселона", flag: "🇪🇸"},
+            {year: 2021, name: "Педри", team: "Барселона", flag: "🇪🇸"},
+            {year: 2020, name: "Эрлинг Холанд", team: "Боруссия Д", flag: "🇳🇴"},
+            {year: 2019, name: "Маттейс де Лигт", team: "Аякс", flag: "🇳🇱"},
+            {year: 2018, name: "Килиан Мбаппе", team: "ПСЖ", flag: "🇫🇷"}
+        ];
+
+        const fifaBestWinners = [
+            {year: 2024, name: "Винисиус Жуниор", team: "Реал Мадрид", flag: "🇧🇷"},
+            {year: 2023, name: "Лионель Месси", team: "ПСЖ", flag: "🇦🇷"},
+            {year: 2022, name: "Карим Бензема", team: "Реал Мадрид", flag: "🇫🇷"},
+            {year: 2021, name: "Роберт Левандовски", team: "Бавария", flag: "🇵🇱"},
+            {year: 2020, name: "Роберт Левандовски", team: "Бавария", flag: "🇵🇱"},
+            {year: 2019, name: "Лионель Месси", team: "Барселона", flag: "🇦🇷"},
+            {year: 2018, name: "Криштиану Роналду", team: "Ювентус", flag: "🇵🇹"},
+            {year: 2017, name: "Криштиану Роналду", team: "Реал Мадрид", flag: "🇵🇹"},
+            {year: 2016, name: "Криштиану Роналду", team: "Реал Мадрид", flag: "🇵🇹"}
+        ];
+
+        const worldCupGoldenBall = [
+            {year: 2022, name: "Лионель Месси", flag: "🇦🇷"},
+            {year: 2018, name: "Лука Модрич", flag: "🇭🇷"},
+            {year: 2014, name: "Лионель Месси", flag: "🇦🇷"},
+            {year: 2010, name: "Диего Форлан", flag: "🇺🇾"},
+            {year: 2006, name: "Зинедин Зидан", flag: "🇫🇷"},
+            {year: 2002, name: "Роналдо", flag: "🇧🇷"},
+            {year: 1998, name: "Давид Ромариу", flag: "🇧🇷"},
+            {year: 1994, name: "Ромариу", flag: "🇧🇷"},
+            {year: 1990, name: "Сальваторе Скилаччи", flag: "🇮🇹"},
+            {year: 1986, name: "Диего Марадона", flag: "🇦🇷"},
+            {year: 1982, name: "Паоло Росси", flag: "🇮🇹"},
+            {year: 1978, name: "Марио Кемпес", flag: "🇦🇷"},
+            {year: 1974, name: "Ян Артс", flag: "🇳🇱"},
+            {year: 1970, name: "Герд Мюллер", flag: "🇩🇪"},
+            {year: 1966, name: "Боб Чарли", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+            {year: 1962, name: "Гарринча", flag: "🇧🇷"},
+            {year: 1958, name: "Диди", flag: "🇧🇷"},
+            {year: 1954, name: "Ференц Пушкаш", flag: "🇭🇺"},
+            {year: 1950, name: "Зизиньо", flag: "🇧🇷"},
+            {year: 1938, name: "Леонидас", flag: "🇧🇷"}
+        ];
+
+        // Modal functions
+        function openModal(title, content) {
+            document.getElementById('modalTitle').innerHTML = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modal')) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        function renderPlayerWinners(winners) {
+            return winners.map(w => `
+                <div class="winner-item">
+                    <span class="winner-year">${w.year}</span>
+                    <div>
+                        <div class="winner-name">${w.flag} ${w.name}</div>
+                        <div class="winner-team">${w.team}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTeamWinners(winners) {
+            return winners.map(w => `
+                <div class="team-item">
+                    <div class="team-flag">${w.flag}</div>
+                    <div class="team-name">${w.team}</div>
+                    <div class="team-years">${w.year}</div>
+                </div>
+            `).join('');
+        }
+
+        // Award show functions
+        function showBallonDor() {
+            openModal('🏆 Ballon d\'Or — Все победители', 
+                `<div class="winners-grid">${renderPlayerWinners(ballonDorWinners)}</div>`);
+        }
+
+        function showWomensBallon() {
+            openModal('👑 Women\'s Ballon d\'Or — Все победители',
+                `<div class="winners-grid">${renderPlayerWinners(womensBallonWinners)}</div>`);
+        }
+
+        function showKopaTrophy() {
+            openModal('🌟 Kopa Trophy — Все победители',
+                `<div class="winners-grid">${renderPlayerWinners(kopaTrophyWinners)}</div>`);
+        }
+
+        function showWorldCup() {
+            openModal('🌍 FIFA World Cup — Все победители',
+                `<div class="team-winners">${renderTeamWinners(worldCupWinners)}</div>`);
+        }
+
+        function showEuroCup() {
+            openModal('🇪🇺 UEFA Euro — Все победители',
+                `<div class="team-winners">${renderTeamWinners(euroWinners)}</div>`);
+        }
+
+        function showChampionsLeague() {
+            openModal('🏆 UEFA Champions League — Все победители',
+                `<div class="team-winners">${renderTeamWinners(championsLeagueWinners)}</div>`);
+        }
+
+        function showSuperCup() {
+            const superCupWinners = [
+                {year: 2024, team: "Атлетико Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2023, team: "Манчестер Сити 🇬🇧", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+                {year: 2022, team: "Реал Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2021, team: "Челси 🇬🇧", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+                {year: 2020, team: "Бавария 🇩🇪", flag: "🇩🇪"},
+                {year: 2019, team: "Ливерпуль 🇬🇧", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+                {year: 2018, team: "Атлетико Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2017, team: "Реал Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2016, team: "Реал Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2015, team: "Барселона 🇪🇸", flag: "🇪🇸"},
+                {year: 2014, team: "Реал Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2013, team: "Бавария 🇩🇪", flag: "🇩🇪"},
+                {year: 2012, team: "Челси 🇬🇧", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+                {year: 2011, team: "Барселона 🇪🇸", flag: "🇪🇸"},
+                {year: 2010, team: "Интер 🇮🇹", flag: "🇮🇹"},
+                {year: 2009, team: "Барселона 🇪🇸", flag: "🇪🇸"},
+                {year: 2008, team: "Зенит 🇷🇺", flag: "🇷🇺"}
+            ];
+            openModal('⭐ UEFA Super Cup — Все победители',
+                `<div class="team-winners">${renderTeamWinners(superCupWinners)}</div>`);
+        }
+
+        function showClubWorldCup() {
+            const clubWorldCupWinners = [
+                {year: 2024, team: "Реал Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2023, team: "Манчестер Сити 🇬🇧", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+                {year: 2022, team: "Реал Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2021, team: "Челси 🇬🇧", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+                {year: 2020, team: "Бавария 🇩🇪", flag: "🇩🇪"},
+                {year: 2019, team: "Ливерпуль 🇬🇧", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+                {year: 2018, team: "Реал Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2017, team: "Реал Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2016, team: "Реал Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2015, team: "Барселона 🇪🇸", flag: "🇪🇸"},
+                {year: 2014, team: "Реал Мадрид 🇪🇸", flag: "🇪🇸"},
+                {year: 2013, team: "Бавария 🇩🇪", flag: "🇩🇪"},
+                {year: 2012, team: "Челси 🇬🇧", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+                {year: 2011, team: "Барселона 🇪🇸", flag: "🇪🇸"},
+                {year: 2010, team: "Интер 🇮🇹", flag: "🇮🇹"},
+                {year: 2009, team: "Барселона 🇪🇸", flag: "🇪🇸"},
+                {year: 2008, team: "Манчестер Юнайтед 🇬🇧", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+                {year: 2007, team: "Милан 🇮🇹", flag: "🇮🇹"},
+                {year: 2006, team: "Интер 🇮🇹", flag: "🇮🇹"},
+                {year: 2005, team: "Сан-Паулу 🇧🇷", flag: "🇧🇷"},
+                {year: 2000, team: "Коринтианс 🇧🇷", flag: "🇧🇷"}
+            ];
+            openModal('🌐 FIFA Club World Cup — Все победители',
+                `<div class="team-winners">${renderTeamWinners(clubWorldCupWinners)}</div>`);
+        }
+
+        function showCopaAmerica() {
+            const copaWinners = [
+                {year: 2024, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+                {year: 2021, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+                {year: 2019, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+                {year: 2016, team: "🇨🇱 Чили", flag: "🇨🇱"},
+                {year: 2015, team: "🇨🇱 Чили", flag: "🇨🇱"},
+                {year: 2011, team: "🇺🇾 Уругвай", flag: "🇺🇾"},
+                {year: 2007, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+                {year: 2004, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+                {year: 2001, team: "� kolumbia 🇦🇷", flag: "🇨🇴"},
+                {year: 1997, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+                {year: 1995, team: "🇺🇾 Уругвай", flag: "🇺🇾"},
+                {year: 1993, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+                {year: 1989, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+                {year: 1987, team: "🇺🇾 Уругвай", flag: "🇺🇾"},
+                {year: 1983, team: "🇺🇾 Уругвай", flag: "🇺🇾"},
+                {year: 1979, team: "🇵🇾 Парагвай", flag: "🇵🇾"},
+                {year: 1975, team: "🇵🇪 Перу", flag: "🇵🇪"},
+                {year: 1953, team: "🇵🇾 Парагвай", flag: "🇵🇾"},
+                {year: 1942, team: "🇺🇾 Уругвай", flag: "🇺🇾"},
+                {year: 1939, team: "🇵🇪 Перу", flag: "🇵🇪"},
+                {year: 1935, team: "🇺🇾 Уругвай", flag: "🇺🇾"},
+                {year: 1929, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+                {year: 1927, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+                {year: 1925, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+                {year: 1922, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+                {year: 1921, team: "🇦🇷 Аргентина", flag: "🇦🇷"},
+                {year: 1919, team: "🇧🇷 Бразилия", flag: "🇧🇷"},
+                {year: 1917, team: "🇺🇾 Уругвай", flag: "🇺🇾"},
+                {year: 1916, team: "🇺🇾 Уругвай", flag: "🇺🇾"}
+            ];
+            openModal('🏅 Copa América — Все победители',
+                `<div class="team-winners">${renderTeamWinners(copaWinners)}</div>`);
+        }
+
+        function showFIFAPlayer() {
+            openModal('👤 The Best FIFA Men\'s Player — Все победители',
+                `<div class="winners-grid">${renderPlayerWinners(fifaBestWinners)}</div>`);
+        }
+
+        function showPuskas() {
+            const puskasWinners = [
+                {year: 2024, name: "Ламин Ямаль", team: "Барселона", flag: "🇪🇸"},
+                {year: 2023, name: "Коста Янко", team: "Бонфермили", flag: "🇭🇺"},
+                {year: 2022, name: "Арсений Сагнай", team: "Борнмут", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+                {year: 2021, name: "Сон Хын-Мин", team: "Тоттенхэм", flag: "🇰🇷"},
+                {year: 2020, name: "Сон Хын-Мин", team: "Тоттенхэм", flag: "🇰🇷"},
+                {year: 2019, name: "Сон Хын-Мин", team: "Тоттенхэм", flag: "🇰🇷"},
+                {year: 2018, name: "Салем Аль-Дажри", team: "Аль-Файсали", flag: "🇸🇦"},
+                {year: 2017, name: "Оливье Жиру", team: "Арсенал", flag: "🇫🇷"},
+                {year: 2016, name: "Сон Хын-Мин", team: "Тоттенхэм", flag: "🇰🇷"},
+                {year: 2015, name: "Веслі Морган", team: "Лестер", flag: "🇯🇲"},
+                {year: 2014, name: "Хейтар Джулиус", team: "Кеблавик", flag: "🇮🇸"},
+                {year: 2013, name: "Иракли Азулай", team: "Маккаби", flag: "🇮🇱"},
+                {year: 2012, name: "Фалкао", team: "Атлетико", flag: "🇨🇴"},
+                {year: 2011, name: "Криштиану Роналду", team: "Реал Мадрид", flag: "🇵🇹"},
+                {year: 2010, name: "Лукас Подольски", team: "Кёльн", flag: "🇩🇪"},
+                {year: 2009, name: "Криштиану Роналду", team: "Манчестер Юнайтед", flag: "🇵🇹"}
+            ];
+            openModal('🎯 Puskás Award — Все победители',
+                `<div class="winners-grid">${renderPlayerWinners(puskasWinners)}</div>`);
+        }
+
+        function showFIFAGoldenBall() {
+            openModal('🎖️ World Cup Golden Ball — Все победители',
+                `<div class="winners-grid">${renderPlayerWinners(worldCupGoldenBall)}</div>`);
+        }
+
         // Time Control
         let seconds = 0;
         let isRunning = false;
         let speed = 1;
-        let interval;
 
         function updateClock() {
             const h = Math.floor(seconds / 3600);
@@ -603,24 +1331,10 @@
             }
         }
 
-        function toggleTime() {
-            isRunning = !isRunning;
-        }
-
-        function resetTime() {
-            seconds = 0;
-            speed = 1;
-            isRunning = false;
-            updateClock();
-        }
-
-        function speedUp() {
-            speed = Math.min(speed + 0.5, 10);
-        }
-
-        function speedDown() {
-            speed = Math.max(speed - 0.5, 0.5);
-        }
+        function toggleTime() { isRunning = !isRunning; }
+        function resetTime() { seconds = 0; speed = 1; isRunning = false; updateClock(); }
+        function speedUp() { speed = Math.min(speed + 0.5, 10); }
+        function speedDown() { speed = Math.max(speed - 0.5, 0.5); }
 
         setInterval(tick, 1000/60);
         updateClock();
